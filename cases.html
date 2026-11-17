@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心产品矩阵｜成都文化大数据有限公司</title>
+  <meta name="description" content="成都文化大数据有限公司首批发布的6大核心产品：数字文化资产运营平台、文化数字资产交易平台、文化消费大数据平台、文化数智云平台、AI应用智能体集群、文化内容安全风控平台，以及智慧文旅、数据治理、资源建设三大落地案例。">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <h3>站内检索</h3>
+      <form class="search-input" id="searchForm">
+        <input type="text" id="searchInput" placeholder="输入关键词…" autocomplete="off">
+        <button type="submit">检 索</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="page-hero">
+    <div class="page-hero__bird" id="heroBird"></div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 核心产品</div>
+      <h1>核心产品矩阵</h1>
+      <div class="sub">PRODUCT MATRIX · 首批发布的6大核心产品与落地案例</div>
+    </div>
+  </section>
+
+  <main class="section section--paper" style="margin-top:0">
+    <div class="container">
+      <div class="content-tabs" id="caseFilter"></div>
+      <div class="case-grid" id="caseGrid" style="margin-top:26px"></div>
+    </div>
+  </main>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">落地案例<span class="en">CASES · 已交付项目与数据成果</span></h2>
+      </div>
+      <div class="case-grid" id="projGrid" style="margin-top:26px"></div>
+    </div>
+  </section>
+
+  <section class="cross-band">
+    <div class="container cross-band__inner">
+      <div>
+        <p class="cross-band__label">RELATED</p>
+        <h2 class="cross-band__title">这些产品依托哪些业务体系？</h2>
+        <p class="cross-band__desc">智慧文旅解决方案、数据治理与平台运营、文化大数据资源建设三大业务体系，6大核心产品是它们在具体场景中的落地形态。</p>
+      </div>
+      <a class="btn btn--ghost" href="business.html">查看业务体系 →</a>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+      document.getElementById('heroBird').innerHTML = CDBGApp.BIRD_RAYS;
+
+      var cats = ['全部'].concat(d.cases.map(function (c) { return c.category; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
+      var filterEl = document.getElementById('caseFilter');
+      var state = { cat: '全部' };
+
+      filterEl.innerHTML = cats.map(function (c, i) {
+        return '<button data-cat="' + CDBGApp.esc(c) + '" class="' + (i === 0 ? 'active' : '') + '">' + CDBGApp.esc(c) + '</button>';
+      }).join('');
+      filterEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-cat]');
+        if (!btn) return;
+        state.cat = btn.getAttribute('data-cat');
+        filterEl.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        render();
+      });
+
+      function render() {
+        var list = d.cases;
+        if (state.cat !== '全部') list = list.filter(function (c) { return c.category === state.cat; });
+        document.getElementById('caseGrid').innerHTML = list.map(function (c, i) {
+          return '<div class="case-card reveal in">'
+            + '<div class="case-card__cover cat--' + (i % 4) + ' cat-' + (i % 4) + '"><span class="glyph">' + CDBGApp.esc((c.title || '文').slice(0, 2)) + '</span></div>'
+            + '<div class="case-card__body"><span class="case-card__cat">' + CDBGApp.esc(c.category) + '</span>'
+            + '<h3>' + CDBGApp.esc(c.title) + '</h3><p>' + CDBGApp.esc(c.desc) + '</p>'
+            + '<div class="case-card__tags">' + (c.tags || []).map(function (t) { return '<span>' + CDBGApp.esc(t) + '</span>'; }).join('') + '</div>'
+            + '<div class="case-card__metric">' + CDBGApp.esc(c.metric || '') + '</div></div></div>';
+        }).join('') || '<div class="empty" style="grid-column:1/-1"><span class="glyph">空</span>该分类暂无案例</div>';
+      }
+      render();
+
+      /* 落地案例 */
+      document.getElementById('projGrid').innerHTML = (d.projects || []).map(function (c, i) {
+        return '<div class="case-card reveal">'
+          + '<div class="case-card__cover cat--' + (i % 4) + ' cat-' + (i % 4) + '"><span class="glyph">' + CDBGApp.esc(c.category.slice(0, 1)) + '</span></div>'
+          + '<div class="case-card__body"><span class="case-card__cat">' + CDBGApp.esc(c.category) + '</span>'
+          + '<h3>' + CDBGApp.esc(c.title) + '</h3><p>' + CDBGApp.esc(c.desc) + '</p>'
+          + '<div class="case-card__metric">' + CDBGApp.esc(c.metric || '') + '</div></div></div>';
+      }).join('');
+
+      CDBGApp.init({ active: 'cases' });
+    })();
+  </script>
+</body>
+</html>

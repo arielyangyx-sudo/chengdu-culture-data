@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公司介绍｜成都文化大数据有限公司</title>
+  <meta name="description" content="成都文化大数据有限公司是在市委宣传部指导下，由成都传媒集团、成都传媒产业集团于2026年3月全资组建的文化科技企业，注册资本6000万元，定位文化数据生态运营商。">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <h3>站内检索</h3>
+      <form class="search-input" id="searchForm">
+        <input type="text" id="searchInput" placeholder="输入关键词…" autocomplete="off">
+        <button type="submit">检 索</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="page-hero">
+    <div class="page-hero__bird" id="heroBird"></div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 公司介绍</div>
+      <h1>公司介绍</h1>
+      <div class="sub">ABOUT US · 2026年3月全资组建 · 注册资本6000万元</div>
+    </div>
+  </section>
+
+  <section class="section section--paper pattern-grid" style="margin-top:0">
+    <div class="container about-grid">
+      <div class="about-text reveal">
+        <h3>公司概况</h3>
+        <p id="aboutIntro"></p>
+      </div>
+      <div class="culture-cards" id="cultureCards"></div>
+    </div>
+    <div class="container">
+      <div class="milestones" id="milestones"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">数据总览<span class="en">KEY FIGURES</span></h2>
+      </div>
+      <div class="stats" style="background:var(--white);border-radius:12px;box-shadow:var(--shadow-sm);padding:34px 0" id="statsRow"></div>
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">联系我们<span class="en">CONTACT</span></h2>
+      </div>
+      <div class="contact-grid" id="contactGrid"></div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+      var s = d.site;
+      document.getElementById('heroBird').innerHTML = CDBGApp.BIRD_RAYS;
+
+      document.getElementById('aboutIntro').textContent = d.about.intro;
+      document.getElementById('cultureCards').innerHTML = d.about.culture.map(function (c) {
+        return '<div class="culture-card reveal"><b>' + CDBGApp.esc(c.title) + '</b><span>' + CDBGApp.esc(c.text) + '</span></div>';
+      }).join('');
+      document.getElementById('milestones').innerHTML = d.about.milestones.map(function (m) {
+        return '<div class="milestone reveal"><div class="year">' + CDBGApp.esc(m.year) + '</div><p>' + CDBGApp.esc(m.text) + '</p></div>';
+      }).join('');
+
+      document.getElementById('statsRow').innerHTML = d.stats.map(function (st) {
+        return '<div class="stat"><div class="stat__value">' + CDBGApp.esc(st.value) + '<span class="unit">' + CDBGApp.esc(st.unit) + '</span></div><div class="stat__label">' + CDBGApp.esc(st.label) + '</div></div>';
+      }).join('');
+
+      var cards = [
+        { icon: 'mail', t: '商务合作邮箱', v: s.email },
+        { icon: 'pin', t: '公司地址', v: s.address },
+        { icon: 'orbit', t: '主要合作方', v: (s.partners || []).join(' · ') },
+        { icon: 'sparkle', t: '生态合作', v: '诚邀文博、文旅、文创企业及科技、传媒、金融机构共建文化大数据产业生态圈，合作申请请致函邮箱并注明"生态合作"' }
+      ].filter(function (c) { return c.v && String(c.v).trim(); });
+      document.getElementById('contactGrid').innerHTML = cards.map(function (c) {
+        return '<div class="contact-card reveal"><div class="ic">' + CDBGApp.ICONS[c.icon] + '</div><div><b>' + CDBGApp.esc(c.t) + '</b><span>' + CDBGApp.esc(c.v) + '</span></div></div>';
+      }).join('');
+
+      CDBGApp.init({ active: 'about' });
+    })();
+  </script>
+</body>
+</html>

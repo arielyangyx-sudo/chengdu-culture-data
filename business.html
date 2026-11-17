@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>业务体系｜成都文化大数据有限公司</title>
+  <meta name="description" content="成都文化大数据有限公司的三大业务体系：智慧文旅解决方案、数据治理与平台运营、文化大数据资源建设，为景区、场馆、文旅主管部门与文博单位提供数据驱动的全链条服务。">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <h3>站内检索</h3>
+      <form class="search-input" id="searchForm">
+        <input type="text" id="searchInput" placeholder="输入关键词…" autocomplete="off">
+        <button type="submit">检 索</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="page-hero">
+    <div class="page-hero__bird" id="heroBird"></div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 业务体系</div>
+      <h1>业务体系</h1>
+      <div class="sub">BUSINESS SYSTEM · 三大业务体系，覆盖数据到场景的完整链路</div>
+    </div>
+  </section>
+
+  <section class="section biz-sec" style="margin-top:0">
+    <div class="container">
+      <div class="biz-tabs" id="bizTabs"></div>
+      <div id="bizPanels"></div>
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">三大业务体系总览<span class="en">BUSINESS OVERVIEW</span></h2>
+      </div>
+      <div class="case-grid" id="bizOverview"></div>
+    </div>
+  </section>
+
+  <section class="cross-band">
+    <div class="container cross-band__inner">
+      <div>
+        <p class="cross-band__label">RELATED</p>
+        <h2 class="cross-band__title">业务能力最终落在这 6 个产品上</h2>
+        <p class="cross-band__desc">首批核心产品包括数字文化资产运营平台、文化数字资产交易平台、文化消费大数据平台、文化数智云平台、AI应用智能体集群与文化内容安全风控平台。</p>
+      </div>
+      <a class="btn btn--ghost" href="cases.html">查看核心产品 →</a>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+      document.getElementById('heroBird').innerHTML = CDBGApp.BIRD_RAYS;
+
+      var glyphs = { wisdom: '旅', govern: '治', reslib: '藏' };
+      var cats = ['wisdom', 'govern', 'reslib'];
+
+      var tabsEl = document.getElementById('bizTabs');
+      var panelsEl = document.getElementById('bizPanels');
+      tabsEl.innerHTML = d.businesses.map(function (b, i) {
+        return '<button data-id="' + b.id + '" class="' + (i === 0 ? 'active' : '') + '">' + CDBGApp.esc(b.name) + '</button>';
+      }).join('');
+      panelsEl.innerHTML = d.businesses.map(function (b, i) {
+        return '<div class="biz-panel' + (i === 0 ? ' active' : '') + '" data-panel="' + b.id + '">'
+          + '<div class="biz-panel__text"><h3><span>BUSINESS / 0' + (i + 1) + '</span>' + CDBGApp.esc(b.name) + '</h3>'
+          + '<p>' + CDBGApp.esc(b.brief) + '</p><ul class="biz-panel__points">'
+          + (b.points || []).map(function (p) { return '<li>' + CDBGApp.esc(p) + '</li>'; }).join('')
+          + '</ul></div>'
+          + '<div class="biz-panel__visual"><span class="glyph">' + CDBGApp.esc(glyphs[b.id] || '文') + '</span><span class="metric">' + CDBGApp.esc(b.metric || '') + '</span></div>'
+          + '</div>';
+      }).join('');
+      tabsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-id]');
+        if (!btn) return;
+        tabsEl.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        panelsEl.querySelectorAll('.biz-panel').forEach(function (p) {
+          p.classList.toggle('active', p.getAttribute('data-panel') === btn.getAttribute('data-id'));
+        });
+      });
+
+      document.getElementById('bizOverview').innerHTML = d.businesses.map(function (b, i) {
+        var gi = cats.indexOf(b.id);
+        return '<div class="case-card reveal">'
+          + '<div class="case-card__cover cat--' + (gi >= 0 ? gi : i % 4) + ' cat-' + (gi >= 0 ? gi : i % 4) + '"><span class="glyph">' + CDBGApp.esc(glyphs[b.id] || '文') + '</span></div>'
+          + '<div class="case-card__body"><span class="case-card__cat">' + CDBGApp.esc(b.metric || '') + '</span>'
+          + '<h3>' + CDBGApp.esc(b.name) + '</h3><p>' + CDBGApp.esc(b.brief) + '</p>'
+          + '<div class="case-card__metric">' + (b.points || []).slice(0, 2).map(CDBGApp.esc).join(' · ') + '</div></div></div>';
+      }).join('');
+
+      CDBGApp.init({ active: 'business' });
+    })();
+  </script>
+</body>
+</html>

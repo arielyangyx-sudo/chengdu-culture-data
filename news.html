@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新闻公告｜成都文化大数据有限公司</title>
+  <meta name="description" content="成都文化大数据有限公司的新闻动态与通知公告：公司要闻、产品发布、业务进展、软件著作权登记与行业观察。">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <h3>站内检索</h3>
+      <form class="search-input" id="searchForm">
+        <input type="text" id="searchInput" placeholder="输入关键词…" autocomplete="off">
+        <button type="submit">检 索</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="page-hero">
+    <div class="page-hero__bird" id="heroBird"></div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 新闻公告</div>
+      <h1>新闻公告</h1>
+      <div class="sub">NEWS &amp; NOTICES · 公司要闻、行业观察与通知公告</div>
+    </div>
+  </section>
+
+  <main class="section" style="margin-top:0">
+    <div class="container">
+      <div class="content-tabs" id="newsTabs">
+        <button data-tab="news" class="active">新闻动态</button>
+        <button data-tab="notices" id="noticeTabBtn">通知公告</button>
+      </div>
+      <div class="search-input" style="max-width:420px;border-radius:10px;margin:18px 0 6px">
+        <input type="text" id="listFilter" placeholder="在本栏目内筛选标题关键字…">
+      </div>
+      <div class="page-list" id="pageList"></div>
+      <div class="pager" id="pager"></div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+      document.getElementById('heroBird').innerHTML = CDBGApp.BIRD_RAYS;
+
+      var PAGE_SIZE = 6;
+      var state = { tab: 'news', page: 1, kw: '' };
+      if (location.hash === '#notices') state.tab = 'notices';
+
+      var tabsEl = document.getElementById('newsTabs');
+      function setTab(tab) {
+        state.tab = tab; state.page = 1; state.kw = '';
+        document.getElementById('listFilter').value = '';
+        tabsEl.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === tab); });
+        render();
+      }
+      tabsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-tab]');
+        if (btn) setTab(btn.getAttribute('data-tab'));
+      });
+      document.getElementById('listFilter').addEventListener('input', function () {
+        state.kw = this.value.trim(); state.page = 1; render();
+      });
+
+      function currentItems() {
+        var list = state.tab === 'news' ? d.news : d.notices;
+        if (state.kw) list = list.filter(function (n) { return (n.title || '').indexOf(state.kw) > -1; });
+        return list;
+      }
+
+      function render() {
+        var list = currentItems();
+        var pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+        if (state.page > pages) state.page = pages;
+        var slice = list.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
+
+        var listEl = document.getElementById('pageList');
+        if (!slice.length) {
+          listEl.innerHTML = '<div class="empty"><span class="glyph">空</span>暂无内容（可在管理端添加）</div>';
+        } else {
+          listEl.innerHTML = slice.map(function (n) {
+            if (state.tab === 'news') {
+              return '<div class="page-list__item" data-id="' + CDBGApp.esc(n.id) + '">'
+                + '<span class="page-list__date">' + CDBGApp.esc(n.date) + '</span>'
+                + '<span class="page-list__title">' + CDBGApp.esc(n.title) + '</span>'
+                + '<span class="page-list__cat">' + CDBGApp.esc(n.category || '') + '</span></div>';
+            }
+            return '<div class="page-list__item" data-id="' + CDBGApp.esc(n.id) + '">'
+              + '<span class="page-list__date">' + CDBGApp.esc(n.date) + '</span>'
+              + '<span class="page-list__title">' + CDBGApp.esc(n.title) + '</span>'
+              + '<span class="page-list__cat" style="background:rgba(201,162,39,.12);color:#8a6d1f">公告</span></div>';
+          }).join('');
+          listEl.querySelectorAll('.page-list__item').forEach(function (el) {
+            el.addEventListener('click', function () {
+              var item = currentItems().filter(function (x) { return x.id === el.getAttribute('data-id'); })[0];
+              if (item) CDBGApp.showDetail(item.title, item.date + (item.category ? ' · ' + item.category : ''), item.body || '（正文待补充）', item.image);
+            });
+          });
+        }
+
+        var pagerEl = document.getElementById('pager');
+        var btns = '';
+        btns += '<button ' + (state.page === 1 ? 'disabled' : '') + ' data-p="' + (state.page - 1) + '">‹</button>';
+        for (var i = 1; i <= pages; i++) {
+          if (pages > 7 && i > 2 && i < pages - 1 && Math.abs(i - state.page) > 1) {
+            if (btns.indexOf('…') === -1 || i === Math.floor(pages / 2)) btns += '<button disabled>…</button>';
+            continue;
+          }
+          btns += '<button class="' + (i === state.page ? 'active' : '') + '" data-p="' + i + '">' + i + '</button>';
+        }
+        btns += '<button ' + (state.page === pages ? 'disabled' : '') + ' data-p="' + (state.page + 1) + '">›</button>';
+        pagerEl.innerHTML = btns;
+        pagerEl.querySelectorAll('button[data-p]').forEach(function (b) {
+          if (!b.disabled) b.addEventListener('click', function () {
+            state.page = +b.getAttribute('data-p');
+            render();
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+          });
+        });
+      }
+
+      render();
+      // 锚点进入时同步 Tab 高亮
+      tabsEl.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-tab') === state.tab);
+      });
+      CDBGApp.init({ active: 'news' });
+    })();
+  </script>
+</body>
+</html>

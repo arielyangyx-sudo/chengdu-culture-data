@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+# 内部资料，不对外发布
+docs/
+features.html

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成都文化大数据有限公司｜让文化数据活起来、动起来、用起来、转起来</title>
+  <meta name="description" content="成都文化大数据有限公司2026年3月由成都传媒集团、成都传媒产业集团全资组建，注册资本6000万元，定位文化数据生态运营商。业务覆盖智慧文旅解决方案、数据治理与平台运营、文化大数据资源建设，首批发布6大核心产品。">
+  <meta name="keywords" content="成都文化大数据,文化数据,数字文创,文化数字资产,成都文化数智云">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "成都文化大数据有限公司",
+    "alternateName": "成都文化大数据",
+    "url": "https://www.cdculdata.cn/",
+    "foundingDate": "2026-03",
+    "description": "赋能城市高质量发展的文化数据生态运营商，业务覆盖智慧文旅解决方案、数据治理与平台运营、文化大数据资源建设。",
+    "parentOrganization": { "@type": "Organization", "name": "成都传媒集团" }
+  }
+  </script>
+</head>
+<body>
+<h1 class="sr-only">成都文化大数据有限公司 — 文化数据生态运营商</h1>
+  <div id="site-header"></div>
+
+  <!-- 搜索浮层 -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <h3>站内检索</h3>
+      <form class="search-input" id="searchForm">
+        <input type="text" id="searchInput" placeholder="输入关键词：文物、非遗、数据资产…" autocomplete="off">
+        <button type="submit">检 索</button>
+      </form>
+      <div class="search-hot">热门：<a href="javascript:void(0)" onclick="CDBGApp.doSearch('非遗')">非遗数据</a><a href="javascript:void(0)" onclick="CDBGApp.doSearch('金沙')">金沙遗址</a><a href="javascript:void(0)" onclick="CDBGApp.doSearch('大模型')">文枢大模型</a><a href="javascript:void(0)" onclick="CDBGApp.doSearch('公告')">通知公告</a></div>
+    </div>
+  </div>
+
+  <!-- Banner 轮播 -->
+  <div class="carousel" id="bannerCarousel" aria-label="焦点轮播"></div>
+
+  <!-- 数据概览 -->
+  <div class="stats-band pattern-grid">
+    <div class="container">
+      <div class="stats" id="statsRow"></div>
+    </div>
+  </div>
+
+  <!-- 三大功能定位 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">发展定位<span class="en">POSITIONING · 全链条体系</span></h2>
+      </div>
+      <div class="fn-grid" id="fnGrid"></div>
+    </div>
+  </section>
+
+  <!-- 业务体系（Tab 切换） -->
+  <section class="section biz-sec">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title" style="color:#fff">业务体系<span class="en" style="color:rgba(255,255,255,.5)">BUSINESS SYSTEM</span></h2>
+        <a class="more-link" style="color:rgba(255,255,255,.7)" href="business.html">业务详情 <span class="arr">→</span></a>
+      </div>
+      <div class="biz-tabs" id="bizTabs"></div>
+      <div id="bizPanels"></div>
+    </div>
+  </section>
+
+  <!-- 数据成果 / 案例 -->
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">核心产品 · 矩阵<span class="en">PRODUCT MATRIX</span></h2>
+        <a class="more-link" href="cases.html">查看全部 <span class="arr">→</span></a>
+      </div>
+      <div class="case-grid" id="caseGrid"></div>
+    </div>
+  </section>
+
+  <!-- 数据脉搏（黑金 Canvas 动效段） -->
+  <section class="flow-sec" aria-label="数据脉搏">
+    <canvas class="flow-sec__canvas" id="flowCanvas" aria-hidden="true"></canvas>
+    <div class="flow-sec__overlay">
+      <h2>数据脉搏<span class="en">DATA PULSE · 文化数据实时流动</span></h2>
+      <p class="lead">四段业务跑在同一套数据底座上。下面这组数字用于演示看板形态，接入真实指标后替换。</p>
+      <div class="pulse-chips">
+        <div class="chip"><b data-tick="2864">2,864</b><span>累计数据调用（万次）</span></div>
+        <div class="chip"><b data-tick="372">372</b><span>新增数据资产（项）</span></div>
+        <div class="chip"><b data-tick="120">120</b><span>接入生态机构（家）</span></div>
+      </div>
+      <div class="flow-ticker" aria-hidden="true"></div>
+      <p class="demo-note">DEMO · 模拟数字，非真实运营指标</p>
+    </div>
+  </section>
+
+  <!-- 新闻动态 + 通知公告 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">新闻动态<span class="en">NEWS</span></h2>
+        <a class="more-link" href="news.html">更多动态 <span class="arr">→</span></a>
+      </div>
+      <div class="news-sec">
+        <div id="newsList"></div>
+        <aside class="notice-box reveal">
+          <h3>通知公告 <span class="badge">NEW</span></h3>
+          <ul class="notice-list" id="noticeList"></ul>
+          <a class="more-link" href="news.html#notices" style="margin-top:16px;display:inline-flex">全部公告 <span class="arr">→</span></a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 公司速览 -->
+  <section class="section about-band pattern-grid">
+    <div class="container about-grid">
+      <div class="about-text reveal">
+        <h3>公司介绍</h3>
+        <p id="aboutIntro"></p>
+        <a class="btn btn--primary" href="about.html">了解更多</a>
+      </div>
+      <div class="culture-cards" id="cultureCards"></div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+
+      /* 轮播 */
+      CDBGApp.initCarousel(document.getElementById('bannerCarousel'), d.banners);
+
+      /* 数据概览 */
+      document.getElementById('statsRow').innerHTML = d.stats.map(function (s) {
+        return '<div class="stat"><div class="stat__value">' + CDBGApp.esc(s.value) + '<span class="unit">' + CDBGApp.esc(s.unit) + '</span></div><div class="stat__label">' + CDBGApp.esc(s.label) + '</div></div>';
+      }).join('');
+
+      /* 功能定位 */
+      document.getElementById('fnGrid').innerHTML = d.functions.map(function (f, i) {
+        return '<div class="fn-card reveal"><span class="fn-card__no">0' + (i + 1) + '</span>'
+          + '<div class="fn-card__icon">' + (CDBGApp.ICONS[f.icon] || CDBGApp.ICONS.database) + '</div>'
+          + '<h3>' + CDBGApp.esc(f.title) + '</h3><p>' + CDBGApp.esc(f.desc) + '</p></div>';
+      }).join('');
+
+      /* 业务体系 Tab */
+      var glyphs = { wisdom: '旅', govern: '治', reslib: '藏' };
+      var tabsEl = document.getElementById('bizTabs');
+      var panelsEl = document.getElementById('bizPanels');
+      tabsEl.innerHTML = d.businesses.map(function (b, i) {
+        return '<button data-id="' + b.id + '" class="' + (i === 0 ? 'active' : '') + '">' + CDBGApp.esc(b.name) + '</button>';
+      }).join('');
+      panelsEl.innerHTML = d.businesses.map(function (b, i) {
+        return '<div class="biz-panel' + (i === 0 ? ' active' : '') + '" data-panel="' + b.id + '">'
+          + '<div class="biz-panel__text"><h3><span>BUSINESS / 0' + (i + 1) + '</span>' + CDBGApp.esc(b.name) + '</h3>'
+          + '<p>' + CDBGApp.esc(b.brief) + '</p><ul class="biz-panel__points">'
+          + (b.points || []).map(function (p) { return '<li>' + CDBGApp.esc(p) + '</li>'; }).join('')
+          + '</ul></div>'
+          + '<div class="biz-panel__visual"><span class="glyph">' + CDBGApp.esc(glyphs[b.id] || '文') + '</span><span class="metric">' + CDBGApp.esc(b.metric || '') + '</span></div>'
+          + '</div>';
+      }).join('');
+      tabsEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-id]');
+        if (!btn) return;
+        tabsEl.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        panelsEl.querySelectorAll('.biz-panel').forEach(function (p) {
+          p.classList.toggle('active', p.getAttribute('data-panel') === btn.getAttribute('data-id'));
+        });
+      });
+
+      /* 案例精选（前 3 条） */
+      document.getElementById('caseGrid').innerHTML = d.cases.slice(0, 3).map(function (c, i) {
+        return '<a class="case-card reveal" href="cases.html"> <div class="case-card__cover cat--' + (i % 4) + ' cat-' + (i % 4) + '"><span class="glyph">' + CDBGApp.esc(c.category.slice(0, 1)) + '</span></div>'
+          + '<div class="case-card__body"><span class="case-card__cat">' + CDBGApp.esc(c.category) + '</span>'
+          + '<h3>' + CDBGApp.esc(c.title) + '</h3><p>' + CDBGApp.esc(c.desc) + '</p>'
+          + '<div class="case-card__tags">' + (c.tags || []).map(function (t) { return '<span>' + CDBGApp.esc(t) + '</span>'; }).join('') + '</div>'
+          + '<div class="case-card__metric">' + CDBGApp.esc(c.metric || '') + '</div></div></a>';
+      }).join('');
+
+      /* 新闻 + 公告 */
+      document.getElementById('newsList').innerHTML = d.news.slice(0, 5).map(CDBGApp.renderNewsItem).join('');
+      CDBGApp.bindDetail('#newsList .news-list__item', function () { return d.news; });
+      document.getElementById('noticeList').innerHTML = d.notices.map(function (n) {
+        return '<li data-id="' + n.id + '"><div class="notice-list__title">' + CDBGApp.esc(n.title) + '</div><div class="notice-list__date">' + CDBGApp.esc(n.date) + '</div></li>';
+      }).join('');
+      CDBGApp.bindDetail('#noticeList li', function () { return d.notices; });
+
+      /* 关于 */
+      document.getElementById('aboutIntro').textContent = d.about.intro;
+      document.getElementById('cultureCards').innerHTML = d.about.culture.map(function (c) {
+        return '<div class="culture-card reveal"><b>' + CDBGApp.esc(c.title) + '</b><span>' + CDBGApp.esc(c.text) + '</span></div>';
+      }).join('');
+
+      CDBGApp.init({ active: 'home' });
+    })();
+  </script>
+</body>
+</html>

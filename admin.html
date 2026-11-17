@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容管理｜成都文化大数据有限公司</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <div class="admin-head">
+      <h1>内容管理后台</h1>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="adminUser" style="font-size:13px;color:var(--text-muted)"></span>
+        <button class="btn btn--ghost btn--sm" id="btnLogout">退出登录</button>
+      </div>
+    </div>
+
+    <!-- 登录视图 -->
+    <div class="login-box" id="loginView">
+      <h1>管理员登录</h1>
+      <p class="hint">普通访客无需登录，可直接浏览前台；管理员登录后可维护站点内容。</p>
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="form-item"><label>账号</label><input type="text" id="loginUser" placeholder="默认 admin" autocomplete="username"></div>
+        <div class="form-item"><label>密码</label><input type="password" id="loginPass" placeholder="默认 cddb2026" autocomplete="current-password"></div>
+      </div>
+      <button class="btn btn--primary" id="btnLogin">登 录</button>
+      <div class="login-err" id="loginErr"></div>
+    </div>
+
+    <!-- 管理视图 -->
+    <div id="adminView" style="display:none">
+      <div class="admin-card">
+        <h2>内容管理</h2>
+        <div class="admin-toolbar">
+          <div class="admin-tabs" id="adminTabs">
+            <button data-tab="news" class="active">新闻动态</button>
+            <button data-tab="notices">通知公告</button>
+            <button data-tab="banners">轮播 Banner</button>
+            <button data-tab="cases">成果案例</button>
+          </div>
+          <button class="btn btn--gold btn--sm" id="btnNew">＋ 新增</button>
+        </div>
+        <table class="admin-table">
+          <thead><tr><th style="width:90px">日期</th><th>标题</th><th style="width:80px">分类</th><th style="width:150px">操作</th></tr></thead>
+          <tbody id="adminTbody"></tbody>
+        </table>
+      </div>
+
+      <!-- 编辑表单 -->
+      <div class="admin-card" id="editCard" style="display:none">
+        <h2 id="editTitle">编辑内容</h2>
+        <div class="form-grid">
+          <div class="form-item form-item--full"><label>标题 *</label><input type="text" id="fTitle"></div>
+          <div class="form-item"><label>日期</label><input type="date" id="fDate"></div>
+          <div class="form-item"><label>分类 / 标签</label><input type="text" id="fCat" placeholder="如：公司要闻"></div>
+          <div class="form-item form-item--full"><label>摘要</label><input type="text" id="fSummary" placeholder="列表中展示的简短摘要"></div>
+          <div class="form-item form-item--full"><label>正文</label><textarea id="fBody" placeholder="完整正文内容"></textarea></div>
+          <div class="form-item form-item--full"><label>跳转链接（轮播 Banner 专用，可留空）</label><input type="text" id="fLink" placeholder="如 business.html"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:22px">
+          <button class="btn btn--primary btn--sm" id="btnSave">保存发布</button>
+          <button class="btn btn--ghost btn--sm" id="btnCancel">取消</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>站点信息</h2>
+        <div class="form-grid">
+          <div class="form-item"><label>公司名称</label><input type="text" id="sName"></div>
+          <div class="form-item"><label>英文名</label><input type="text" id="sEn"></div>
+          <div class="form-item"><label>服务热线</label><input type="text" id="sHotline"></div>
+          <div class="form-item"><label>邮箱</label><input type="text" id="sEmail"></div>
+          <div class="form-item form-item--full"><label>地址</label><input type="text" id="sAddr"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
+          <button class="btn btn--primary btn--sm" id="btnSaveSite">保存站点信息</button>
+          <button class="btn btn--danger btn--sm" id="btnReset">恢复默认占位内容</button>
+          <a class="btn btn--ghost btn--sm" href="index.html" target="_blank">预览前台</a>
+        </div>
+        <p style="margin-top:16px;font-size:12.5px;color:var(--text-muted)">说明：内容保存在浏览器本地存储（localStorage）中，前台页面即时生效；本演示无服务器端持久化，正式部署时需接入后台服务。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var AUTH_KEY = 'ccdg_admin_session';
+      var CRED_KEY = 'ccdg_admin_cred';
+      var DEFAULT_USER = { user: 'admin', pass: 'cddb2026' };
+
+      var state = { tab: 'news', editing: null }; // editing: {mode, id}
+      var d = CDBG.data();
+
+      /* ---------- 会话 ---------- */
+      function cred() {
+        try { return JSON.parse(localStorage.getItem(CRED_KEY)) || DEFAULT_USER; }
+        catch (e) { return DEFAULT_USER; }
+      }
+      function isLogin() { return sessionStorage.getItem(AUTH_KEY) === '1'; }
+
+      document.getElementById('btnLogin').addEventListener('click', function () {
+        var u = document.getElementById('loginUser').value.trim();
+        var p = document.getElementById('loginPass').value;
+        var c = cred();
+        if (u === c.user && p === c.pass) {
+          sessionStorage.setItem(AUTH_KEY, '1');
+          showView();
+          toast('登录成功');
+        } else {
+          document.getElementById('loginErr').textContent = '账号或密码不正确（默认 admin / cddb2026）';
+        }
+      });
+      document.getElementById('loginPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
+      document.getElementById('btnLogout').addEventListener('click', function () {
+        sessionStorage.removeItem(AUTH_KEY);
+        showView();
+      });
+
+      function showView() {
+        var ok = isLogin();
+        document.getElementById('loginView').style.display = ok ? 'none' : 'block';
+        document.getElementById('adminView').style.display = ok ? 'block' : 'none';
+        document.getElementById('adminUser').textContent = ok ? '已登录：' + cred().user : '';
+        if (ok) { renderTable(); loadSiteForm(); }
+      }
+
+      /* ---------- Toast ---------- */
+      function toast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show toast--ok';
+        clearTimeout(t._tm);
+        t._tm = setTimeout(function () { t.className = 'toast'; }, 2200);
+      }
+
+      /* ---------- 当前栏目数据 ---------- */
+      function currentArr() { return d[state.tab]; }
+      function persist() { CDBG.save(d); }
+
+      /* ---------- 表格 ---------- */
+      function renderTable() {
+        var tbody = document.getElementById('adminTbody');
+        var arr = currentArr() || [];
+        if (!arr.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:36px">暂无内容，点击右上角「新增」</td></tr>'; return; }
+        tbody.innerHTML = arr.map(function (item) {
+          return '<tr><td class="t-date">' + CDBGApp.esc(item.date || '—') + '</td>'
+            + '<td class="t-title">' + CDBGApp.esc(item.title) + '</td>'
+            + '<td>' + CDBGApp.esc(item.category || item.tag || '—') + '</td>'
+            + '<td><div class="row-actions">'
+            + '<button class="act-edit" data-id="' + CDBGApp.esc(item.id) + '">编辑</button>'
+            + '<button class="act-del" data-id="' + CDBGApp.esc(item.id) + '">删除</button>'
+            + '</div></td></tr>';
+        }).join('');
+      }
+
+      document.getElementById('adminTbody').addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-id]');
+        if (!btn) return;
+        var id = btn.getAttribute('data-id');
+        if (btn.classList.contains('act-del')) {
+          if (!confirm('确认删除该条内容？')) return;
+          d[state.tab] = d[state.tab].filter(function (x) { return x.id !== id; });
+          persist(); renderTable(); toast('已删除');
+        } else {
+          openEditor('edit', id);
+        }
+      });
+
+      /* ---------- Tab ---------- */
+      document.getElementById('adminTabs').addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-tab]');
+        if (!btn) return;
+        state.tab = btn.getAttribute('data-tab');
+        this.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        closeEditor();
+        renderTable();
+      });
+
+      /* ---------- 编辑器 ---------- */
+      function openEditor(mode, id) {
+        state.editing = { mode: mode, id: id };
+        var item = null;
+        if (mode === 'edit') {
+          item = d[state.tab].filter(function (x) { return x.id === id; })[0];
+          if (!item) return;
+        }
+        document.getElementById('editTitle').textContent = (mode === 'new' ? '新增' : '编辑') + tabName();
+        document.getElementById('fTitle').value = item ? item.title : '';
+        document.getElementById('fDate').value = item ? (item.date || today()) : today();
+        document.getElementById('fCat').value = item ? (item.category || item.tag || '') : '';
+        document.getElementById('fSummary').value = item ? (item.summary || item.subtitle || '') : '';
+        document.getElementById('fBody').value = item ? (item.body || item.desc || '') : '';
+        document.getElementById('fLink').value = item ? (item.link || '') : '';
+        document.getElementById('editCard').style.display = 'block';
+        document.getElementById('editCard').scrollIntoView({ behavior: 'smooth' });
+      }
+      function closeEditor() {
+        state.editing = null;
+        document.getElementById('editCard').style.display = 'none';
+      }
+      function tabName() {
+        return { news: '新闻', notices: '公告', banners: '轮播', cases: '案例' }[state.tab] || '内容';
+      }
+      function today() {
+        var t = new Date();
+        return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+      }
+      function genId() { return state.tab.slice(0, 1) + '_' + Date.now().toString(36); }
+
+      document.getElementById('btnNew').addEventListener('click', function () { openEditor('new'); });
+      document.getElementById('btnCancel').addEventListener('click', closeEditor);
+
+      document.getElementById('btnSave').addEventListener('click', function () {
+        var title = document.getElementById('fTitle').value.trim();
+        if (!title) { alert('请填写标题'); return; }
+        var obj = {
+          id: state.editing && state.editing.mode === 'edit' ? state.editing.id : genId(),
+          title: title,
+          date: document.getElementById('fDate').value || today(),
+          category: document.getElementById('fCat').value.trim(),
+          summary: document.getElementById('fSummary').value.trim(),
+          body: document.getElementById('fBody').value.trim(),
+          link: document.getElementById('fLink').value.trim()
+        };
+        if (state.tab === 'banners') {
+          obj.tag = obj.category || '公司动态';
+          obj.subtitle = obj.summary || obj.body;
+          delete obj.summary; delete obj.category;
+        }
+        if (state.tab === 'cases') {
+          obj.category = obj.category || '数字文博';
+          obj.desc = obj.body || obj.summary;
+          obj.tags = (obj.category || '').split(/[、,，\s]+/).filter(Boolean);
+          obj.metric = '—';
+          delete obj.summary; delete obj.date;
+        }
+        if (state.editing && state.editing.mode === 'edit') {
+          var idx = d[state.tab].findIndex(function (x) { return x.id === state.editing.id; });
+          d[state.tab][idx] = Object.assign({}, d[state.tab][idx], obj);
+        } else {
+          d[state.tab].unshift(obj);
+        }
+        persist(); renderTable(); closeEditor(); toast('已保存并发布至前台');
+      });
+
+      /* ---------- 站点信息 ---------- */
+      function loadSiteForm() {
+        document.getElementById('sName').value = d.site.name;
+        document.getElementById('sEn').value = d.site.enName;
+        document.getElementById('sHotline').value = d.site.hotline;
+        document.getElementById('sEmail').value = d.site.email;
+        document.getElementById('sAddr').value = d.site.address;
+      }
+      document.getElementById('btnSaveSite').addEventListener('click', function () {
+        d.site.name = document.getElementById('sName').value.trim() || d.site.name;
+        d.site.enName = document.getElementById('sEn').value.trim() || d.site.enName;
+        d.site.hotline = document.getElementById('sHotline').value.trim();
+        d.site.email = document.getElementById('sEmail').value.trim();
+        d.site.address = document.getElementById('sAddr').value.trim();
+        persist(); toast('站点信息已更新');
+      });
+
+      document.getElementById('btnReset').addEventListener('click', function () {
+        if (!confirm('将清除所有本地修改，恢复默认占位内容，确认？')) return;
+        CDBG.reset();
+        d = CDBG.data();
+        renderTable(); loadSiteForm(); toast('已恢复默认内容');
+      });
+
+      showView();
+    })();
+  </script>
+</body>
+</html>

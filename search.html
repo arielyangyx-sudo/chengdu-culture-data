@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>站内检索｜成都文化大数据有限公司</title>
+  <meta name="description" content="按关键词查找成都文化大数据有限公司的新闻、公告、核心产品与业务体系信息。">
+  <meta name="robots" content="noindex, follow">
+  <link rel="preload" as="font" type="font/woff2" href="assets/fonts/manrope.woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=202611174">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero" style="padding:56px 0">
+    <div class="page-hero__bird" id="heroBird"></div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">首页</a> / 站内检索</div>
+      <h1 style="font-size:clamp(26px,3.4vw,36px)">站内检索</h1>
+    </div>
+  </section>
+
+  <main class="section" style="margin-top:0">
+    <div class="container">
+      <div class="search-input" style="max-width:560px">
+        <input type="text" id="searchBox" placeholder="输入关键词：文物、非遗、公告…" autocomplete="off">
+        <button id="searchBtn">检 索</button>
+      </div>
+      <div style="margin:16px 0 8px;font-size:13px;color:var(--text-muted)" id="resultMeta"></div>
+      <div class="page-list" id="results"></div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/fx.js"></script>
+  <script>
+    (function () {
+      var d = CDBG.data();
+      document.getElementById('heroBird').innerHTML = CDBGApp.BIRD_RAYS;
+
+      function getQuery() {
+        return new URLSearchParams(location.search).get('q') || '';
+      }
+
+      function run() {
+        var q = document.getElementById('searchBox').value.trim() || getQuery();
+        document.getElementById('searchBox').value = q;
+        if (!q) {
+          document.getElementById('resultMeta').textContent = '';
+          document.getElementById('results').innerHTML = '<div class="empty"><span class="glyph">搜</span>请输入检索关键词</div>';
+          return;
+        }
+        var pool = [].concat(
+          d.news.map(function (n) { return { type: '新闻', cat: n.category, item: n }; }),
+          d.notices.map(function (n) { return { type: '公告', cat: '', item: n }; }),
+          d.cases.map(function (n) { return { type: '案例', cat: n.category, item: n }; }),
+          d.businesses.map(function (n) { return { type: '业务', cat: '', item: { id: n.id, title: n.name, date: '', body: n.brief } }; })
+        );
+        var hits = pool.filter(function (e) {
+          var it = e.item;
+          return ((it.title || '') + (it.summary || '') + (it.body || '') + (it.desc || '') + (e.cat || '')).toLowerCase().indexOf(q.toLowerCase()) > -1;
+        });
+
+        document.getElementById('resultMeta').textContent = '关键词「' + q + '」共检索到 ' + hits.length + ' 条结果';
+        var el = document.getElementById('results');
+        if (!hits.length) {
+          el.innerHTML = '<div class="empty"><span class="glyph">无</span>未检索到相关内容，换个关键词试试</div>';
+          return;
+        }
+        el.innerHTML = hits.map(function (h) {
+          var it = h.item;
+          return '<div class="result-item" data-type="' + h.type + '" data-id="' + CDBGApp.esc(it.id || '') + '">'
+            + '<span class="r-date">' + CDBGApp.esc(it.date || '') + '</span>'
+            + '<span class="r-type">' + CDBGApp.esc(h.type) + '</span>'
+            + '<span class="r-title">' + CDBGApp.esc(it.title) + '</span>'
+            + '<div class="r-summary">' + CDBGApp.esc(it.summary || it.body || it.desc || '') + '</div></div>';
+        }).join('');
+
+        el.querySelectorAll('.result-item').forEach(function (r) {
+          r.addEventListener('click', function () {
+            if (r.getAttribute('data-type') === '业务') { location.href = 'business.html'; return; }
+            if (r.getAttribute('data-type') === '案例') { location.href = 'cases.html'; return; }
+            CDBGApp.showDetail(r.querySelector('.r-title').textContent, r.querySelector('.r-date').textContent, (function () {
+              var id = r.getAttribute('data-id');
+              var all = r.getAttribute('data-type') === '新闻' ? d.news : d.notices;
+              var item = all.filter(function (x) { return x.id === id; })[0];
+              return item ? (item.body || item.title) : '（详情待补充）';
+            })());
+          });
+        });
+      }
+
+      document.getElementById('searchBtn').addEventListener('click', run);
+      document.getElementById('searchBox').addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
+      run();
+      CDBGApp.init({ active: 'search' });
+    })();
+  </script>
+</body>
+</html>
